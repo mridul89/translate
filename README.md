@@ -23,7 +23,7 @@ for example-
 Limitations
 -----------
 * While searching for template files that needs translation, it may also go through template files from other modules.
-* It only goes through design files which are referenced directly in layout xml or code, will leave them if not.
+* It only goes through design files which are referenced directly in layout xml or code, or are in the common folders. This, though enough for most cases, may leave out some design files.
 * The name of generated CSV file is always same as the module name.
 
 TODO list
