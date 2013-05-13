@@ -37,6 +37,39 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		$dir->walk( array( $this, 'dir' ) );
 		unset( $dir );
 
+		// traverse through all module files in design/frontend/base/default/template directory for translatable strings
+		$dir = Mage::getBaseDir( 'design' ) . DS . 'frontend' . DS . 'base' . DS . 'default' . DS . 'template' . DS;
+		foreach ( explode( '_', strtolower( $module ) ) as $path )
+			$dir = $dir . $path . DS;
+		if ( file_exists( $dir ) ) {
+			/* @var $dir Varien_Directory_Collection */
+			$dir = Varien_Directory_Factory::getFactory( $dir );
+			$dir->walk( array( $this, 'dir' ) );
+			unset( $dir );
+		}
+
+		// traverse through all module files in design/adminhtml/default/default/template directory for translatable strings
+		$dir = Mage::getBaseDir( 'design' ) . DS . 'adminhtml' . DS . 'default' . DS . 'default' . DS . 'template' . DS;
+		foreach ( explode( '_', strtolower( $module ) ) as $path )
+			$dir = $dir . $path . DS;
+		if ( file_exists( $dir ) ) {
+			/* @var $dir Varien_Directory_Collection */
+			$dir = Varien_Directory_Factory::getFactory( $dir );
+			$dir->walk( array( $this, 'dir' ) );
+			unset( $dir );
+		}
+
+		// traverse through all module files in design/install/default/default/template directory for translatable strings
+		$dir = Mage::getBaseDir( 'design' ) . DS . 'install' . DS . 'default' . DS . 'default' . DS . 'template' . DS;
+		foreach ( explode( '_', strtolower( $module ) ) as $path )
+			$dir = $dir . $path . DS;
+		if ( file_exists( $dir ) ) {
+			/* @var $dir Varien_Directory_Collection */
+			$dir = Varien_Directory_Factory::getFactory( $dir );
+			$dir->walk( array( $this, 'dir' ) );
+			unset( $dir );
+		}
+
 		// go through the config.xml to find translatable strings in defined layouts
 		$dir = Mage::getModuleDir( 'etc', $module );
 		/* @var $dir Varien_File_Object */
