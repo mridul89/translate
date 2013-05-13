@@ -313,8 +313,12 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 
 		if ( $tags = $xml->getAttribute( 'translate' ) ) {
 			$tags = explode( ' ', $tags );
-			foreach ( $tags as $tag )
-				$this->addString( $xml->$tag );
+			foreach ( $tags as $tag ) {
+				$string = trim( $xml->$tag );
+				if ( false !== strpos( $string, '<![CDATA[' ) )
+					$string = substr( $string, 9, strlen( $string ) - 11 );
+				$this->addString( $string );
+			}
 		}
 
 		foreach ( $xml->children() as $child )
