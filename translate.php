@@ -114,7 +114,6 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 
 		foreach ( $strings as &$string ) {
 			$string = str_replace( '"', '\"', $string );
-			$string = str_replace( '\\\\', '\\', $string );
 		}
 		unset( $string );
 
@@ -123,16 +122,19 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		foreach ( $translations as &$t ) {
 			preg_match( '/.+(\",\").+/', $t, $matches, PREG_OFFSET_CAPTURE );
 			array_shift( $matches );
-			foreach ( $matches as $k => $v )
-				if ( '\\' === $t{$v[1] - 1} )
+			foreach ( $matches as $k => $v ) {
+				if ( '\\' === $t{$v[1] - 1} || ( '"' === $t{$v[1] - 1} && '"' !== $t{$v[1] - 2} ) )
 					unset( $matches[$k] );
+			}
 
 			if ( !count( $matches ) )
 				continue;
 
 			$t = array( substr( $t, 1, $matches[0][1] - 1 ), substr( $t, $matches[0][1] + 3, -1 ) );
+			$t[0] = str_replace( '""', '\"', $t[0] );
 			$t[0] = str_replace( '"', '\"', $t[0] );
 			$t[0] = str_replace( '\\\\', '\\', $t[0] );
+			$t[1] = str_replace( '""', '\"', $t[1] );
 			$t[1] = str_replace( '"', '\"', $t[1] );
 			$t[1] = str_replace( '\\\\', '\\', $t[1] );
 
@@ -149,7 +151,7 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		ob_start();
 		foreach ( $translations as $string )
 			echo "\"$string[0]\",\"$string[1]\"\n";
-		file_put_contents( $file, ob_get_clean() );
+		file_put_contents( $file, str_replace( '\"', '""', ob_get_clean() ) );
 	}
 
 	/**
