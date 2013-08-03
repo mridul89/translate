@@ -72,18 +72,22 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 
 		// go through the config.xml to find translatable strings in defined layouts
 		$dir = Mage::getModuleDir( 'etc', $module );
+		$layoutfiles = array();
 		/* @var $dir Varien_File_Object */
 		$dir = Varien_Directory_Factory::getFactory( $dir . DS . 'config.xml' );
 		$xml = new Varien_Simplexml_Config( (string) $dir );
 		$xml = $xml->getNode();
 		foreach ( array( 'global', 'frontend', 'adminhtml', 'install' ) as $scope ) {
-			if ( isset( $xml->$scope ) && isset( $xml->$scope->layout ) )
+			if ( isset( $xml->$scope ) && isset( $xml->$scope->layout ) && isset($xml->$scope->layout->updates) ) {
+				$layoutfiles[$scope] = array();
 				foreach ( $xml->$scope->layout->updates->children() as $child ) {
 					$file = $child->file;
 					$file = Mage::getBaseDir( 'design' ) . DS . $scope . DS . 'base' . DS . 'default' . DS . 'layout' . DS . $file;
+					$file = Varien_Directory_Factory::getFactory($file);
 					$this->processXML( $file );
-					$this->processLayout( $file, $scope );
+					$layoutfiles[$scope][] = $file;
 				}
+			}
 
 			if ( isset( $xml->$scope ) )
 				foreach ( $xml->$scope->children() as $child )
@@ -92,6 +96,10 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 							$this->_processtemplate( $layout->template, $scope );
 		}
 		unset( $dir );
+
+		foreach($layoutfiles as $scope => $files)
+			foreach($files as $file)
+				$this->processLayout( $file, $scope );
 
 		// create translation files from all the collected strings
 		$dir = Varien_Directory_Factory::getFactory( Mage::getBaseDir( 'locale' ) );
