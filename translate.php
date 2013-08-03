@@ -380,7 +380,7 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 	}
 
 	/**
-	 * Process an xml Element & check for available translation strings
+	 * Process an xml Element & check for available templates
 	 *
 	 * @param $xml Varien_Simplexml_Element
 	 * @param $type string
