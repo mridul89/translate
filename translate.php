@@ -413,19 +413,22 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		$types = (array) $types;
 
 		foreach ( $types as $type ) {
-			/* @var $dir Varien_Directory_Collection */
-			$dir = Varien_Directory_Factory::getFactory( Mage::getBaseDir( 'design' ) . DS . $type );
-			foreach ( $dir->getItems() as $package )
-				foreach ( $package->getItems() as $theme ) {
-					/* @var $theme Varien_Directory_Collection */
-					if ( is_dir( $theme->getPath() . DS . 'template' ) )
-						if ( is_readable( $theme->getPath() . DS . 'template' . DS . $template ) ) {
-							$file = Varien_Directory_Factory::getFactory( $theme->getPath() . DS . 'template' . DS . $template );
+			$dir = array_filter(array_diff(scandir(Mage::getBaseDir( 'design' ) . DS . $type), array('..', '.')), 'is_dir');
+			foreach ( $dir as $package ) {
+				$themes = array_filter(array_diff(scandir(Mage::getBaseDir( 'design' ) . DS . $type . DS . $package), array('..', '.')), 'is_dir');
+				foreach($themes as &$theme)
+					$theme = Mage::getBaseDir( 'design' ) . DS . $type . DS . $package . DS . $theme;
+				unset($theme);
+				foreach ( $themes as $theme ) {
+					if ( is_dir( $theme . DS . 'template' ) )
+						if ( is_readable( $theme . DS . 'template' . DS . $template ) ) {
+							$file = Varien_Directory_Factory::getFactory( $theme . DS . 'template' . DS . $template );
 							if ( $file instanceof Varien_File_Object )
 								$this->processPHTML( $file );
+							unset($file);
 						}
 				}
-			unset( $dir );
+			}
 		}
 	}
 
