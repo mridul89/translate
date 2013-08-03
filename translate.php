@@ -196,53 +196,10 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		if ( !( $file instanceof Varien_File_Object ) )
 			return $this;
 
+		$this->_translateFunction($file);
+
 		$source = file_get_contents( $file );
 		$tokens = token_get_all( $source );
-
-		while ( $token = next( $tokens ) ) {
-			// $token is equivalent to array( <token ID> , <actual token> , <line number> )
-
-			if ( is_string( $token ) || T_OBJECT_OPERATOR !== $token[0] )
-				continue;
-
-			do {
-				$token = next( $tokens );
-			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
-
-			if ( is_string( $token ) || T_STRING !== $token[0] || '__' !== $token[1] )
-				continue;
-
-			$line = $token[2];
-
-			do {
-				$token = next( $tokens );
-			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
-
-			if ( '(' !== $token )
-				continue;
-
-			do {
-				$token = next( $tokens );
-			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
-
-			if ( is_string( $token ) || T_CONSTANT_ENCAPSED_STRING !== $token[0] ) {
-				echo "Invalid translation string detected in $file at line $line\n";
-				continue;
-			}
-
-			$text = substr( $token[1], 1, strlen( $token[1] ) - 2 );
-
-			do {
-				$token = next( $tokens );
-			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
-
-			if ( ',' !== $token && ')' !== $token ) {
-				echo "Invalid translation string detected in $file at line $line\n";
-				continue;
-			}
-
-			$this->addString( $text );
-		}
 
 		reset( $tokens );
 		while ( $token = next( $tokens ) ) {
@@ -293,6 +250,61 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		return $this;
 	}
 
+	protected function _translateFunction($file) {
+		if ( !( $file instanceof Varien_File_Object ) )
+			return $this;
+
+		$source = file_get_contents( $file );
+		$tokens = token_get_all( $source );
+
+		while ( $token = next( $tokens ) ) {
+			// $token is equivalent to array( <token ID> , <actual token> , <line number> )
+
+			if ( is_string( $token ) || T_OBJECT_OPERATOR !== $token[0] )
+				continue;
+
+			do {
+				$token = next( $tokens );
+			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
+
+			if ( is_string( $token ) || T_STRING !== $token[0] || '__' !== $token[1] )
+				continue;
+
+			$line = $token[2];
+
+			do {
+				$token = next( $tokens );
+			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
+
+			if ( '(' !== $token )
+				continue;
+
+			do {
+				$token = next( $tokens );
+			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
+
+			if ( is_string( $token ) || T_CONSTANT_ENCAPSED_STRING !== $token[0] ) {
+				echo "Invalid translation string detected in $file at line $line\n";
+				continue;
+			}
+
+			$text = substr( $token[1], 1, strlen( $token[1] ) - 2 );
+
+			do {
+				$token = next( $tokens );
+			} while ( is_array( $token ) && T_WHITESPACE === $token[0] );
+
+			if ( ',' !== $token && ')' !== $token ) {
+				echo "Invalid translation string detected in $file at line $line\n";
+				continue;
+			}
+
+			$this->addString( $text );
+		}
+
+		return $this;
+	}
+
 	/**
 	 * @param $file Varien_File_Object
 	 *
@@ -332,7 +344,8 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 	 * @return AnattaDesign_Shell_Translate
 	 */
 	public function processPHTML( $file ) {
-		return $this->processPHP( $file );
+		$this->_translateFunction($file);
+		return $this;
 	}
 
 	/**
