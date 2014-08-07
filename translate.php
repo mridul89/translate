@@ -24,6 +24,10 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 	 * Run script
 	 */
 	public function run() {
+		if( $path = $this->getArg( 'p' )  ) {
+			$this->runAtOutsideDir( $path );
+			die('completed');
+		}
 		// if module doesn't exist show error
 		$module = $this->getArg( 'module' ) ? $this->getArg( 'module' ) : $this->getArg( 'm' );
 		$modules = array_keys( (array)Mage::getConfig()->getNode( 'modules' )->children() );
@@ -205,9 +209,9 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		if( !( $file instanceof Varien_File_Object ) )
 			return $this;
 
-		$this->_translateFunction( $file );
+		$this->_translateFunction( $file->getPathname() );
 
-		$source = file_get_contents( $file );
+		$source = file_get_contents( $file->getPathname() );
 		$tokens = token_get_all( $source );
 
 		reset( $tokens );
@@ -323,7 +327,7 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		if( !( $file instanceof Varien_File_Object ) )
 			return $this;
 
-		$xml = new Varien_Simplexml_Config( (string)$file );
+		$xml = new Varien_Simplexml_Config( $file->getPathname() );
 
 		$this->_xmlelement( $xml->getNode() );
 
@@ -340,7 +344,7 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		if( !( $file instanceof Varien_File_Object ) )
 			return $this;
 
-		$xml = new Varien_Simplexml_Config( (string)$file );
+		$xml = new Varien_Simplexml_Config( $file->getPathname() );
 
 		$this->_searchtemplates( $xml->getNode(), $type );
 
@@ -353,7 +357,7 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 	 * @return AnattaDesign_Shell_Translate
 	 */
 	public function processPHTML( $file ) {
-		$this->_translateFunction( $file );
+		$this->_translateFunction( $file->getPathname() );
 		return $this;
 	}
 
