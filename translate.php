@@ -113,6 +113,23 @@ class AnattaDesign_Shell_Translate extends Mage_Shell_Abstract {
 		unset( $dir );
 	}
 
+	public function runAtOutsideDir( $path ) {
+		$dirCode = Varien_Directory_Factory::getFactory( $path . DS . 'app' . DS . 'code' );
+		$dirCode->walk( array( $this, 'dir' ) );
+		//$this->dir( $dirCode );
+		unset( $dirCode );
+		$dirDesign = Varien_Directory_Factory::getFactory( $path . DS . 'app' . DS . 'design' );
+		$dirDesign->walk(  array( $this, 'dir' ) );
+		unset( $dirDesign );
+		$module = 'AnattaDesign_AwesomeCheckout';
+		// create translation files from all the collected strings
+		$dir = Varien_Directory_Factory::getFactory( $path . DS . 'app' . DS . 'locale' );
+		/* @var $dir Varien_Directory_Collection */
+		foreach( $dir->getItems() as $item )
+			$this->generateCSV( $item, $module );
+		unset( $dir );
+	}
+
 	/**
 	 * Process the directory & search each file for translation strings
 	 *
